@@ -33,7 +33,7 @@ class WrkElectricityRack extends TetherWrkBase {
     }
 
     this.setInitFacs([
-      ['fac', '@bitfinex/bfx-facs-scheduler', '0', 'f2', {}, -10],
+      ['fac', '@bitfinex/bfx-facs-scheduler', '0', '0', {}, -10],
       [
         'fac',
         '@tetherto/hp-svc-facs-store',
@@ -55,14 +55,17 @@ class WrkElectricityRack extends TetherWrkBase {
           super._start(next)
         },
         async () => {
-          const db = await this.store_s1.getBee(
+          this.db = await this.store_s1.getBee(
             { name: 'electricity' },
             { keyEncoding: 'binary' }
           )
-          await db.ready()
-          this.settings = db.sub('settings')
+          await this.db.ready()
+          this.settings = this.db.sub('settings')
           this.net_r0.rpcServer.respond('getWrkExtData', async (req) => {
             return await this.net_r0.handleReply('getWrkExtData', req)
+          })
+          this.net_r0.rpcServer.respond('setWrkExtData', async (req) => {
+            return await this.net_r0.handleReply('setWrkExtData', req)
           })
         }
       ],
@@ -98,6 +101,10 @@ class WrkElectricityRack extends TetherWrkBase {
   }
 
   async getStatsHistory (req) {
+    // no-op
+  }
+
+  async setWrkExtData (req) {
     // no-op
   }
 
